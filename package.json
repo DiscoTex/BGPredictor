@@ -19,6 +19,6 @@
   "dependencies": {
     "express":"*",
     "body-parser":"*"    
-  }
+  },
   "homepage": "https://github.com/DiscoTex/BGPredictor#readme"
 }
