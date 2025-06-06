@@ -30,7 +30,8 @@ This project is a machine learning system for predicting future glucose values f
    ```
 
 3. **Configure Environment Variables**:  
-   Modify the `.env` file in the project root with the following (adjust values as needed):
+   Rename the `.env.sample` file to `.env`
+   Modify `.env` file in the project root with your own Nightscout URL and MongoDB connection string
 
    ```
    NIGHTSCOUT_URL=https://your-nightscout-url.com
@@ -93,7 +94,7 @@ This project is a machine learning system for predicting future glucose values f
   ```
 
 - **For Training the Model:**  
-  Use the `--retrain` flag to force training a new model (with an optional MongoDB URL). This will use a larger dataset (5000 entries if MongoDB is provided, otherwise several hundred from Nightscout). Note that training will overwrite the existing `glucose_predictor` model file:
+  Use the `--retrain` flag to force training a new model (with an optional MongoDB URL). This will use a larger dataset (5000 entries if MongoDB is provided, otherwise several hundred from Nightscout). Note that training will overwrite the existing `glucose_predictor.keras` model file:
   
   ```bash
   python predict2.py --url YOUR_NIGHTSCOUT_URL [--mongo YOUR_MONGODB_URL] --retrain
