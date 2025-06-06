@@ -1,0 +1,4 @@
+add versioning to models and their evaluations.
+add return home button to eval reports
+fix gpu support
+add gpu support to docker

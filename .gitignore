@@ -1,0 +1,4 @@
+.env
+__pycache__/predict2.cpython-310.pyc
+nightscout_data.csv
+nightscout_data.json

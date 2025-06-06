@@ -1,0 +1,18 @@
+.btn {
+    font-size: 16px;
+    padding: 10px 20px;
+    background-color: #5563DE;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background-color: #485fc7;
+}
+
+.progress {
+    margin-top: 10px;
+    font-style: italic;
+}
