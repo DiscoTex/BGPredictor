@@ -2,12 +2,12 @@
 
 This project is a machine learning system for predicting future glucose values from Nightscout data. It leverages an LSTM neural network built with TensorFlow and uses additional tools such as NumPy, scikit-learn, and Plotly to process data, train the model, and visualize predictions. It offers CLI or web interface.
 
+![Web Interface Screenshot](images/screenshot.png)
+
 ## Prerequisites
 - The BGPredictor expects you to be an existing Nightscout user with a working instance of Nightscout available. In that case, you likely also have data stored in MongoDB using the Nightscout schema, which is helpful when training a new model.
 - This project utilizes TensorFlow but does not require a GPU. In fact, GPU support is broken on the initial release. Generating predictions takes a few seconds on a midrange CPU and training takes minutes.
 - This project can be built using Docker, which you may need to install first.
-
-![Web Interface Screenshot](images/screenshot.png)
 
 ## Features
 
