@@ -6,6 +6,7 @@ import numpy as np
 from datetime import datetime
 from sklearn.preprocessing import MinMaxScaler
 from dotenv import load_dotenv  # Import load_dotenv
+import re  # Add this import for input sanitization
 
 # Load environment variables from .env file
 load_dotenv()
@@ -29,6 +30,15 @@ DEFAULT_MODEL_NAME = os.environ.get("MODEL_NAME", "glucose_predictor")
 if not DEFAULT_MODEL_NAME:
     raise ValueError("MODEL_NAME environment variable is not set. Please set it in your .env file.")
 
+# Update helper function to allow letters, digits, underscores, hyphens, and dots in the model path input
+def sanitize_model_path(model_path):
+    """
+    Allow only letters, digits, underscores, hyphens, and dots in the model path.
+    """
+    if not re.match(r'^[A-Za-z0-9_.\-]+$', model_path):
+        raise ValueError("Invalid model path. Only letters, digits, underscores, hyphens, and dots are allowed.")
+    return model_path
+
 @app.route('/')
 def index():
     # Pass the NIGHTSCOUT_URL and default model name from the environment to the template.
@@ -47,6 +57,10 @@ def retrain():
     """
     # Get model path from the form; if not provided, use default.
     model_path = request.form.get("model", DEFAULT_MODEL_NAME)
+    try:
+        model_path = sanitize_model_path(model_path)
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
 
     try:
         if MONGODB_URL:
@@ -84,6 +98,10 @@ def predict():
     url = NIGHTSCOUT_URL
     # Get model path from the query parameters; if not provided, use default.
     model_path = request.args.get("model", DEFAULT_MODEL_NAME)
+    try:
+        model_path = sanitize_model_path(model_path)
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
 
     try:
         output_file, data = predict2.get_nightscout_data(url, count=500)
