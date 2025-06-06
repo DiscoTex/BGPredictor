@@ -1,4 +1,4 @@
-# Glucose Prediction Project
+# BGPredictor
 
 This project is a machine learning system for predicting future glucose values from Nightscout data. It leverages an LSTM neural network built with TensorFlow and uses additional tools such as NumPy, scikit-learn, and Plotly to process data, train the model, and visualize predictions. It offers CLI or web interface.
 
