@@ -16,6 +16,8 @@ This project is a machine learning system for predicting future glucose values f
 - **Console Interface**: A command line interface can be used instead.
 - **Performance Evaluation**: After training a new model, this software generates an HTML report with scatter plots comparing predicted and actual values and a plot displaying the mean absolute error (MAE) over time.
 
+![Web Interface Screenshot](images/screenshot.png)
+
 ## Installation
 
 ### Local Machine
