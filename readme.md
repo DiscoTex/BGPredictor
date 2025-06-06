@@ -1,12 +1,16 @@
 # Glucose Prediction Project
 
-This project is a machine learning system for predicting future glucose values from Nightscout data. It leverages an LSTM neural network built with TensorFlow and uses additional tools such as NumPy, scikit-learn, and Plotly to process data, train the model, and visualize predictions.
+This project is a machine learning system for predicting future glucose values from Nightscout data. It leverages an LSTM neural network built with TensorFlow and uses additional tools such as NumPy, scikit-learn, and Plotly to process data, train the model, and visualize predictions. It offers CLI or web interface.
+
+## Prerequisites
+- The BGPredictor expects you to have be an existing Nightscout user with an working instance of Nightscout available and possibly data stored in MongoDB using the Nightscout schema.
+- This project utilizes TensorFlow but does not require a GPU. In fact, GPU support is broken on the initial release. Generating predictions takes a few seconds on a midrange CPU and training takes minutes.
+- This project can be built using Docker, which you may need to install first.
 
 ## Features
 
 - **Data Retrieval**: Downloads glucose (SGV) data from a Nightscout site or directly from MongoDB. Direct download of data from MongoDB allows for a much larger training set (and therefore better results).
-- **Data Processing**: Prepares data sequences using features including the glucose value, day of week, day of month, and time of day.
-- **Model Training**: Trains an LSTM model to predict future glucose values.
+- **Model Training**: Prepares data sequences using features including the glucose value, day of week, day of month, and time of day and then trains an LSTM model to predict future glucose values.
 - **Prediction**: Predicts the next 12 time steps of glucose data (1 hour of 5-minute intervals). Plots values for visualization using Plotly.
 - **Web Interface**: Provides a simple web interface that can be used to get new predictions or train a model
 - **Console Interface**: A command line interface can be used instead.
@@ -16,7 +20,7 @@ This project is a machine learning system for predicting future glucose values f
 
 ### Local Machine
 
-1. **Clone the repository (once this is pushed to GitHub)**:
+1. **Clone the repository**:
 
    ```bash
    git clone https://github.com/DiscoTex/BGPredictor.git
@@ -87,14 +91,14 @@ This project is a machine learning system for predicting future glucose values f
 ### Command-Line Interface (CLI)
 
 - **For Predictions:**  
-  This command loads an existing model and makes predictions. You can optionally provide a MongoDB URL by using the `--mongo` flag:
+  This command loads an existing model and makes predictions based on recent Nightscout data (the most recent 500 entries)
   
   ```bash
-  python predict2.py --url YOUR_NIGHTSCOUT_URL [--mongo YOUR_MONGODB_URL]
+  python predict2.py --url YOUR_NIGHTSCOUT_URL
   ```
 
 - **For Training the Model:**  
-  Use the `--retrain` flag to force training a new model (with an optional MongoDB URL). This will use a larger dataset (5000 entries if MongoDB is provided, otherwise several hundred from Nightscout). Note that training will overwrite the existing `glucose_predictor.keras` model file:
+  Use the `--retrain` flag to force training a new model (with an optional MongoDB URL). This will use a larger dataset (5000 entries if MongoDB is provided, otherwise about 1000 from Nightscout). Training will overwrite the existing `glucose_predictor.keras` model file by default.
   
   ```bash
   python predict2.py --url YOUR_NIGHTSCOUT_URL [--mongo YOUR_MONGODB_URL] --retrain
@@ -105,7 +109,7 @@ This project is a machine learning system for predicting future glucose values f
 **Using the Web UI:**  
      
 - **Request Predictions:**  
-     Upon loading the web interface, the software will download recent Nightscout data, load an existing model and predict the next 12 time steps (1 hour in 5-minute intervals). The predicted glucose values, along with the most recent 5 historical entries, will be displayed.
+     Upon loading the web interface, the software will download 500 entries of recent Nightscout data, load an existing model specified in the .env, and predict the next 12 time steps (1 hour in 5-minute intervals). The predicted glucose values, along with the most recent 5 historical entries, will be displayed in a plot.
      
 - **Train a New Model:**  
      If you need to retrain the model, use the retraining option in the web UI.  
@@ -122,7 +126,3 @@ Feel free to open issues or submit pull requests to enhance the functionality of
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](license.txt) file for details.
-
-## Acknowledgements
-
-This project was developed to improve glucose prediction accuracy for diabetes management and uses data from Nightscout. Special thanks to the open source community for the tools and libraries that made this project possible.
