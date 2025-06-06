@@ -7,6 +7,8 @@ This project is a machine learning system for predicting future glucose values f
 - This project utilizes TensorFlow but does not require a GPU. In fact, GPU support is broken on the initial release. Generating predictions takes a few seconds on a midrange CPU and training takes minutes.
 - This project can be built using Docker, which you may need to install first.
 
+![Web Interface Screenshot](images/screenshot.png)
+
 ## Features
 
 - **Data Retrieval**: Downloads glucose (SGV) data from a Nightscout site or directly from MongoDB. Direct download of data from MongoDB allows for a much larger training set (and therefore better results).
@@ -15,8 +17,6 @@ This project is a machine learning system for predicting future glucose values f
 - **Web Interface**: Provides a simple web interface that can be used to get new predictions or train a model
 - **Console Interface**: A command line interface can be used instead.
 - **Performance Evaluation**: After training a new model, this software generates an HTML report with scatter plots comparing predicted and actual values and a plot displaying the mean absolute error (MAE) over time.
-
-![Web Interface Screenshot](images/screenshot.png)
 
 ## Installation
 
