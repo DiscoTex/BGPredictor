@@ -159,112 +159,70 @@
             document.getElementById('retrain-progress').innerText = 'Retraining model, please wait...';
         });
 
-        // Function to fetch predictions and update the plot and timestamp.
-        function fetchPrediction() {
-            document.getElementById('predict-progress').innerText = 'Generating predictions, please wait...';
+        // Function to update the plot with predictions and recent actual values.
+        function updatePlot(predictions, recent) {
+            var now = new Date();
+
+            // Build x-values for predictions: starting from now, with 5-minute intervals.
+            var predX = [];
+            for (var i = 0; i < predictions.length; i++){
+                var time = new Date(now.getTime() + i * 5 * 60 * 1000);
+                predX.push(time.toLocaleTimeString());
+            }
             
-            // Only the model path is now dynamic.
-            const model = document.getElementById('model-predict').value;
-            const query = `?model=${encodeURIComponent(model)}`;
-            fetch('/predict' + query)
-                .then(response => {
-                    if (!response.ok) {
-                        return response.text().then(text => {
-                            throw new Error(`HTTP error! status: ${response.status}, body: ${text}`);
-                        });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    document.getElementById('predict-progress').innerText = '';
-                    if (data.error) {
-                        alert(`Server Error: ${data.error}`);
-                    } else if (data.predictions && data.recent) {
-                        const now = new Date();
-                        document.getElementById('last-timestamp').textContent = now.toLocaleTimeString();
-                        
-                        const timeStepsPred = data.predictions.map((_, index) => (index + 1) * 5);
-                        const predTrace = {
-                            x: timeStepsPred,
-                            y: data.predictions,
-                            mode: 'lines+markers',
-                            type: 'scatter',
-                            name: 'Predicted',
-                            marker: { color: '#5563DE' }
-                        };
-                        
-                        const timeStepsRecent = data.recent.map((_, index, arr) => ((index + 1) - arr.length) * 5);
-                        const recentTrace = {
-                            x: timeStepsRecent,
-                            y: data.recent,
-                            mode: 'lines+markers',
-                            type: 'scatter',
-                            name: 'Recent Actual',
-                            marker: { color: '#E74C3C' }
-                        };
-                        
-                        const layout = {
-                            title: 'Glucose Predictions vs. Recent Values',
-                            xaxis: { title: 'Time (minutes)' },
-                            yaxis: { title: 'Glucose (mg/dL)', range: [40, 300] },
-                            legend: {
-                                orientation: 'h',
-                                x: 0,
-                                y: -0.3,
-                                xanchor: 'left'
-                            },
-                            margin: { t: 50, b: 120 },
-                            autosize: true,
-                            shapes: [
-                                {
-                                    type: 'line',
-                                    x0: 0,
-                                    x1: 1,
-                                    xref: 'paper',
-                                    y0: 70,
-                                    y1: 70,
-                                    line: {
-                                        color: 'red',
-                                        width: 2,
-                                        dash: 'dash'
-                                    }
-                                },
-                                {
-                                    type: 'line',
-                                    x0: 0,
-                                    x1: 1,
-                                    xref: 'paper',
-                                    y0: 250,
-                                    y1: 250,
-                                    line: {
-                                        color: 'red',
-                                        width: 2,
-                                        dash: 'dash'
-                                    }
-                                }
-                            ]
-                        };
-                        
-                        Plotly.newPlot('plot', [predTrace, recentTrace], layout, { responsive: true });
-                        
-                        const lowBG = data.predictions.some(value => value < 70);
-                        const alertEl = document.getElementById('bg-alert');
-                        alertEl.innerText = lowBG ? "--> LOW BG PREDICTED WITHIN ONE HOUR!  <--" : "";
-                        
-                        const recentBG = data.recent[data.recent.length - 1];
-                        document.getElementById('recent-bg').innerText = "Current BG: " + recentBG;
-                    } else {
-                        alert('Unexpected data format received from server.');
-                        console.error('Received data:', data);
-                    }
-                })
-                .catch(err => {
-                    document.getElementById('predict-progress').innerText = '';
-                    alert('Fetch or Processing Error: ' + err.message);
-                    console.error('Fetch or Processing Error:', err);
-                });
+            // Build x-values for recent values: 5 data points preceding now (5-minute intervals).
+            var recentX = [];
+            for (var j = recent.length; j > 0; j--){
+                var time = new Date(now.getTime() - j * 5 * 60 * 1000);
+                recentX.push(time.toLocaleTimeString());
+            }
+
+            // Create trace for predictions (blue).
+            var predTrace = {
+                x: predX,
+                y: predictions,
+                mode: 'lines+markers',
+                name: 'Predictions',
+                line: { color: 'blue' },
+                marker: { color: 'blue' }
+            };
+
+            // Create trace for recent actual values (red).
+            var recentTrace = {
+                x: recentX,
+                y: recent,
+                mode: 'lines+markers',
+                name: 'Recent Actual',
+                line: { color: 'red' },
+                marker: { color: 'red' }
+            };
+
+            var layout = {
+                title: 'Glucose Predictions',
+                xaxis: { title: 'Time of Day' },
+                yaxis: { title: 'Glucose Value', range: [40, 300] }
+            };
+
+            Plotly.newPlot('plot', [recentTrace, predTrace], layout);
         }
         
+        // Fetch predictions and recent actual values from the server.
+        function fetchPrediction() {
+            fetch('/predict')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        console.error(data.error);
+                        return;
+                    }
+                    updatePlot(data.predictions, data.recent);
+                    // Update the last prediction timestamp with the current wall clock time.
+                    document.getElementById('last-timestamp').innerText = new Date().toLocaleTimeString();
+                })
+                .catch(error => console.error('Error fetching prediction:', error));
+        }
+        
+        // Handle the predict form submission without a page reload.
         document.getElementById('predict-form').addEventListener('submit', function(e) {
             e.preventDefault();
             fetchPrediction();

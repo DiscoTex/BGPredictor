@@ -79,6 +79,7 @@ def retrain():
     try:
         # Evaluate the newly trained model.
         # This function writes the performance report to 'model_performance.html'
+        print("Evaluating model performance...")
         predict2.evaluate_model_performance(model, data, scaler, seq_length, report_path='model_performance.html')
     except Exception as e:
         return jsonify({"error": f"Error evaluating model: {str(e)}"}), 500

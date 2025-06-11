@@ -1,6 +1,8 @@
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # Suppress TF logging
 import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Input, LSTM, Dense
 
 # GPU Detection and Configuration
 def configure_gpu():
@@ -28,8 +30,6 @@ using_gpu = configure_gpu()
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
-from tensorflow.keras.models import load_model, Sequential
-from tensorflow.keras.layers import LSTM, Dense
 from tensorflow.keras.losses import MeanSquaredError  # For model loss calculation
 import subprocess
 import json
@@ -183,25 +183,15 @@ def prepare_sequences(data):
     y = np.array(targets)
     return X, y
 
-def create_lstm_model(input_shape):
-    """
-    Create an LSTM model for glucose prediction.
-    
-    The model has two LSTM layers followed by a Dense layer and an output layer.
-    
-    Parameters:
-        input_shape (tuple): Shape of input sequences (timesteps, features).
-        
-    Returns:
-        tf.keras.Model: Compiled LSTM model.
-    """
+def build_glucose_predictor(seq_length, num_features):
+    # Instead of passing input_shape to the LSTM layer, we start with an Input layer.
     model = Sequential([
-        LSTM(64, return_sequences=True, input_shape=input_shape),
-        LSTM(64),
-        Dense(32),
-        Dense(1)
+        Input(shape=(seq_length, num_features)),
+        LSTM(64, return_sequences=False),
+        Dense(1)  # Adjust as needed for your output
     ])
-    model.compile(optimizer='adam', loss=MeanSquaredError())
+    
+    model.compile(optimizer='adam', loss='mse')
     return model
 
 def train_glucose_model(data, model_path='glucose_predictor'):
@@ -232,7 +222,7 @@ def train_glucose_model(data, model_path='glucose_predictor'):
         
         # Create and train the LSTM model
         print("Training new model...")
-        model = create_lstm_model((X.shape[1], 3))  # Three features per timestep
+        model = build_glucose_predictor(20, 3)  # Sequence length is 20, 3 features per timestep
         print(f"Using {'GPU' if using_gpu else 'CPU'} for training")
         
         history = model.fit(

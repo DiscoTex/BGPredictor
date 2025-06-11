@@ -1,7 +1,9 @@
 tensorflow
-numpy
+numpy<2
 pandas
 scikit-learn
 plotly
 flask
 python-dotenv
+pymongo
+pyOpenSSL>=23.2.0
